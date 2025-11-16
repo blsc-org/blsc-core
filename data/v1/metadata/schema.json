@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BLSC Metadata Schema v1",
+  "type": "object",
+
+  "properties": {
+    "document_id": { "type": "string" },
+    "title": { "type": "string" },
+    "author": { "type": ["string", "null"] },
+    "year": { "type": ["string", "null"] },
+    "source": { "type": "string" },
+    "license": { "type": "string" },
+    "language": { "type": "string", "const": "Bulgarian" },
+    "genre": { "type": "string" },
+    "domain": { "type": "string" },
+    "tokens": { "type": ["integer", "null"] },
+    "sentences": { "type": ["integer", "null"] },
+    "notes": { "type": ["string", "null"] }
+  },
+
+  "required": [
+    "document_id",
+    "title",
+    "source",
+    "license",
+    "language",
+    "genre",
+    "domain"
+  ]
+}
