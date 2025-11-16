@@ -1,9 +1,9 @@
 # blsc-core
-Bulgarian Language &amp; Script Corpus - Core dataset and structure.
-Bulgarian Language & Script Corpus (BLSC)
 
-Core Dataset & Structure
-A long-term open-source initiative for the preservation, digitization, and computational modeling of Bulgarian language and script.
+**Bulgarian Language & Script Corpus – Core Dataset and Structure**
+
+The Bulgarian Language & Script Corpus (BLSC) is a long-term, community-driven, open-source initiative dedicated to the preservation, digitization, and computational modeling of the Bulgarian language and script.
+
 
 1. Overview
 The Bulgarian Language & Script Corpus (BLSC) is a community-driven, open-source effort to build the largest standardized corpus of contemporary and historical Bulgarian texts.
