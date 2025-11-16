@@ -1,0 +1,57 @@
+# Security Policy
+
+The Bulgarian Language & Script Corpus (BLSC) project is committed to maintaining a safe and reliable ecosystem for researchers, developers, and contributors.
+
+Although this project does not deal with executable code in the traditional sense, security considerations are still important — especially for data provenance, integrity, and metadata accuracy.
+
+---
+
+## 📌 Reporting a Vulnerability
+
+If you discover a vulnerability, data integrity issue, or anything that might pose a risk to users or contributors, please:
+
+1. **Do not open a public issue.**
+2. Contact the maintainers privately at:  
+   **atneshkov@gmail.com**
+
+Please include:
+- a detailed description of the issue  
+- steps to reproduce  
+- potential impact  
+- suggested remediation  
+
+You will receive a response within **7 days**.
+
+---
+
+## 📌 Scope
+
+Security issues include (but are not limited to):
+
+- corrupted or tampered datasets  
+- inaccurate licensing or uncertain data provenance  
+- malicious files or scripts uploaded by mistake  
+- integrity problems in corpus metadata  
+- vulnerabilities in tools, scripts, or data pipelines included in the project  
+
+---
+
+## 📌 Out of Scope
+
+- Typos, grammar, or non-functional documentation errors  
+- Requests for new features or data  
+- Low-risk formatting issues  
+
+---
+
+## 📌 Responsible Disclosure
+
+Please follow responsible disclosure practices.  
+We will:
+- validate the issue  
+- address it promptly  
+- acknowledge your contribution unless you prefer to remain anonymous  
+
+---
+
+Thank you for helping keep the project safe and trustworthy.
