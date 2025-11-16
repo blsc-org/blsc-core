@@ -189,9 +189,6 @@ Modular directory structure
 
 This project began as a small initiative — a collaboration between a father and his son — aiming to create a meaningful, lasting contribution to the future of Bulgarian language technology and digital culture.
 
-
----
-
 10. Vision
 
 BLSC aims to become:
