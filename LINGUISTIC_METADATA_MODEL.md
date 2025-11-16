@@ -92,7 +92,6 @@ Field:
 
 ## 5. Metadata Schema Example (JSON)
 
-```json
 {
   "id": "blsc_00001231",
   "author": "Иван Вазов",
@@ -110,7 +109,7 @@ Field:
   "rights": "public_domain"
 }
 
-6. Genre Classification
+## 6. Genre Classification
 
 fiction
 
@@ -138,7 +137,7 @@ other
 
 ---
 
-7. Normalization Versions
+## 7. Normalization Versions
 
 v1: historical → modern baseline
 
@@ -152,7 +151,7 @@ Field: normalization_version
 
 ---
 
-8. Future Extensions (2025–2026)
+## 8. Future Extensions (2025–2026)
 
 extended morphological tagsets,
 
@@ -168,7 +167,7 @@ tokenizer training corpora.
 
 ---
 
-9. Revision Policy
+## 9. Revision Policy
 
 Updates require:
 
