@@ -1,3 +1,11 @@
+<p align="center">
+  <img src="blsc_logo.png" alt="BLSC Logo" width="150">
+</p>
+
+<h1 align="center">Bulgarian Language &amp; Script Corpus (BLSC)</h1>
+<p align="center">
+  Core Dataset and Structure &bull; Open Bulgarian NLP Initiative
+</p>
 # blsc-core
 
 **Bulgarian Language & Script Corpus – Core Dataset and Structure**
