@@ -1,0 +1,14 @@
+{
+  "document_id": "sample001",
+  "title": "Примерен текст 001",
+  "author": "Иван Вазов",
+  "year": "1894",
+  "source": "Public Domain • Excerpt from 'Под игото'",
+  "license": "Public Domain",
+  "language": "Bulgarian",
+  "genre": "literature",
+  "domain": "fiction",
+  "tokens": null,
+  "sentences": null,
+  "notes": "This is a demonstration document used for illustrating the BLSC dataset structure."
+}
