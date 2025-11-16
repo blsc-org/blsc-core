@@ -54,7 +54,7 @@ General questions and project-wide topics can be posted in the **Discussions** a
 ##  Contact (Maintainers)
 For sensitive or private matters only:
 
-**blsc.org.project@gmail.com**  
+**blsc-org@proton.me**
 *(project email — not for data submissions)*
 
 Please do **not** send copyrighted or personal data by email.
