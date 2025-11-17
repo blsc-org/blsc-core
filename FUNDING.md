@@ -98,7 +98,7 @@ BLSC follows strict principles to ensure integrity and openness:
 Organizations interested in funding or collaborating may reach out via:
 
 - GitHub Issues → “Funding & Collaboration”  
-- Email (project contact will be added later)  
+- Email: blsc-org@proton.me 
 - Institutional channels
 
 ---
