@@ -1,0 +1,14 @@
+{
+  "document_id": "sample002",
+  "title": "Примерен текст 002",
+  "author": "BLSC Synthetic",
+  "year": "2025",
+  "source": "Synthetic example created for BLSC structure testing",
+  "license": "MIT-compatible / synthetic",
+  "language": "Bulgarian",
+  "genre": "technical_example",
+  "domain": "demo",
+  "tokens": null,
+  "sentences": null,
+  "notes": "Second demonstration document used to illustrate multi-document structure in BLSC v1."
+}
