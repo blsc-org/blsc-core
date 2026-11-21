@@ -254,9 +254,9 @@
 <body>
 
 <header>
-    <div class="badge">BLSC • v0.1.0-alpha Жив преглед</div>
+    <div class="badge" id="corpusBadge">BLSC • Автоматичен преглед на корпуса</div>
     <h1>Български корпус за език и писменост</h1>
-    <p>Сравнете автентичния исторически правопис (1762–1904 г.) с осъвременения български текст директно от хранилището <strong>blsc-core</strong>.</p>
+    <p>Сравнете автентичния исторически правопис с осъвременения български текст директно от хранилището <strong>blsc-core</strong>.</p>
 </header>
 
 <main>
@@ -264,14 +264,7 @@
         <div class="select-group">
             <label for="sampleSelect">Изберете исторически документ:</label>
             <select id="sampleSelect">
-                <option value="sample003">1762 г. — Паисий Хилендарски: „История славянобългарска“</option>
-                <option value="sample006">1806 г. — Софроний Врачански: „Неделник“ (първа печатна книга)</option>
-                <option value="sample007">1875 г. — Христо Ботев: в. „Знаме“ (революционна публицистика)</option>
-                <option value="sample004">1879 г. — Учредително събрание: „Търновска конституция“</option>
-                <option value="sample010">1884 г. — Захари Стоянов: „Записки по българските въстания“</option>
-                <option value="sample005">1894 г. — Иван Вазов: „Под игото“ (първо издание)</option>
-                <option value="sample009">1895 г. — Алеко Константинов: „Бай Ганьо“</option>
-                <option value="sample008">1904 г. — Елин Пелин: „По жътва“ (Иванчевски правопис)</option>
+                <option value="">Зареждане на списъка от GitHub...</option>
             </select>
         </div>
 
@@ -294,7 +287,7 @@
                 <h2>Оригинален текст (Исторически правопис)</h2>
                 <span class="panel-tag tag-raw">raw</span>
             </div>
-            <div class="text-body" id="rawText"><div class="status-msg">Зареждане от GitHub...</div></div>
+            <div class="text-body" id="rawText"><div class="status-msg">Синхронизиране с GitHub...</div></div>
         </div>
 
         <div class="panel">
@@ -302,12 +295,12 @@
                 <h2>Нормализиран текст (Съвременен български)</h2>
                 <span class="panel-tag tag-norm">normalized</span>
             </div>
-            <div class="text-body" id="normText"><div class="status-msg">Зареждане от GitHub...</div></div>
+            <div class="text-body" id="normText"><div class="status-msg">Синхронизиране с GitHub...</div></div>
         </div>
     </div>
 
     <div class="notes-box">
-        <div id="metaNotes">Изберете документ от менюто, за да видите бележките към правописа.</div>
+        <div id="metaNotes">Зареждане на бележките към правописа...</div>
         <div class="links-row">
             <a id="linkRaw" class="btn-link btn-outline" href="#" target="_blank">RAW (.txt)</a>
             <a id="linkNorm" class="btn-link btn-outline" href="#" target="_blank">NORMALIZED (.txt)</a>
@@ -316,24 +309,39 @@
     </div>
 
     <footer>
-        Данните се зареждат в реално време от <a href="https://github.com/blsc-org/blsc-core" target="_blank">github.com/blsc-org/blsc-core</a> (Лиценз: Public Domain / CC0).
+        Данните се откриват и зареждат автоматично в реално време от <a href="https://github.com/blsc-org/blsc-core" target="_blank">github.com/blsc-org/blsc-core</a> (Лиценз: Public Domain / CC0).
     </footer>
 </main>
 
 <script>
+    const API_META_URL = "https://api.github.com/repos/blsc-org/blsc-core/contents/data/v1/metadata";
     const BASE_RAW_URL = "https://raw.githubusercontent.com/blsc-org/blsc-core/main/data/v1";
     const BASE_GITHUB_URL = "https://github.com/blsc-org/blsc-core/blob/main/data/v1";
+
+    // Резервен списък при лимит на заявките към GitHub API
+    const FALLBACK_SAMPLES = [
+        { id: "sample003", year: "1762", author: "Паисий Хилендарски", title: "История славянобългарска" },
+        { id: "sample006", year: "1806", author: "Софроний Врачански", title: "Неделник" },
+        { id: "sample007", year: "1875", author: "Христо Ботев", title: "в. „Знаме“" },
+        { id: "sample004", year: "1879", author: "Учредително събрание", title: "Търновска конституция" },
+        { id: "sample010", year: "1884", author: "Захари Стоянов", title: "Записки по българските въстания" },
+        { id: "sample005", year: "1894", author: "Иван Вазов", title: "Под игото" },
+        { id: "sample009", year: "1895", author: "Алеко Константинов", title: "Бай Ганьо" },
+        { id: "sample008", year: "1904", author: "Елин Пелин", title: "По жътва" }
+    ];
 
     const selectEl = document.getElementById("sampleSelect");
     const toggleEl = document.getElementById("highlightToggle");
     const rawEl = document.getElementById("rawText");
     const normEl = document.getElementById("normText");
+    const badgeEl = document.getElementById("corpusBadge");
 
     let currentRaw = "";
     let currentNorm = "";
+    const metaCache = {};
 
     function escapeHtml(str) {
-        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     }
 
     function renderTexts() {
@@ -381,6 +389,7 @@
     }
 
     async function loadSample(sampleId) {
+        if (!sampleId) return;
         rawEl.innerHTML = '<div class="status-msg">Зареждане...</div>';
         normEl.innerHTML = '<div class="status-msg">Зареждане...</div>';
 
@@ -389,19 +398,23 @@
         document.getElementById("linkJson").href = `${BASE_GITHUB_URL}/metadata/${sampleId}.json`;
 
         try {
-            const [rawRes, normRes, metaRes] = await Promise.all([
+            const requests = [
                 fetch(`${BASE_RAW_URL}/raw/${sampleId}.txt`),
-                fetch(`${BASE_RAW_URL}/normalized/${sampleId}.txt`),
-                fetch(`${BASE_RAW_URL}/metadata/${sampleId}.json`)
-            ]);
+                fetch(`${BASE_RAW_URL}/normalized/${sampleId}.txt`)
+            ];
+            if (!metaCache[sampleId]) {
+                requests.push(fetch(`${BASE_RAW_URL}/metadata/${sampleId}.json`));
+            }
 
-            if (!rawRes.ok || !normRes.ok || !metaRes.ok) {
+            const responses = await Promise.all(requests);
+            if (!responses[0].ok || !responses[1].ok || (responses[2] && !responses[2].ok)) {
                 throw new Error("Грешка при извличане на данните от GitHub.");
             }
 
-            currentRaw = await rawRes.text();
-            currentNorm = await normRes.text();
-            const meta = await metaRes.json();
+            currentRaw = await responses[0].text();
+            currentNorm = await responses[1].text();
+            const meta = metaCache[sampleId] || await responses[2].json();
+            metaCache[sampleId] = meta;
 
             document.getElementById("metaAuthor").textContent = meta.author || "Неизвестен";
             document.getElementById("metaYear").textContent = meta.year || "—";
@@ -416,11 +429,71 @@
         }
     }
 
+    function populateDropdown(items) {
+        items.sort((a, b) => {
+            const ya = parseInt(a.year, 10) || 9999;
+            const yb = parseInt(b.year, 10) || 9999;
+            return ya - yb;
+        });
+
+        selectEl.innerHTML = "";
+        items.forEach(item => {
+            const opt = document.createElement("option");
+            opt.value = item.id;
+            const yearLabel = item.year ? `${item.year} г. — ` : "";
+            const authorLabel = item.author ? `${item.author}: ` : "";
+            opt.textContent = `${yearLabel}${authorLabel}„${item.title}“`;
+            selectEl.appendChild(opt);
+        });
+
+        badgeEl.textContent = `BLSC • ${items.length} исторически документа (Жив синхрон)`;
+        if (items.length > 0) {
+            loadSample(items[0].id);
+        }
+    }
+
+    async function initCorpus() {
+        try {
+            const listRes = await fetch(API_META_URL);
+            if (!listRes.ok) throw new Error("API limit or network issue");
+            const files = await listRes.json();
+
+            // Взимаме само файловете започващи със sample (без техническите шаблони sample001 и sample002)
+            const jsonFiles = files.filter(f =>
+                f.name.startsWith("sample") &&
+                f.name.endsWith(".json") &&
+                f.name !== "sample001.json" &&
+                f.name !== "sample002.json"
+            );
+
+            const loadedItems = await Promise.all(jsonFiles.map(async file => {
+                const sampleId = file.name.replace(".json", "");
+                const res = await fetch(`${BASE_RAW_URL}/metadata/${file.name}`);
+                const meta = await res.json();
+                metaCache[sampleId] = meta;
+                return {
+                    id: sampleId,
+                    year: meta.year || "",
+                    author: meta.author || "",
+                    title: meta.title || sampleId
+                };
+            }));
+
+            if (loadedItems.length > 0) {
+                populateDropdown(loadedItems);
+            } else {
+                populateDropdown(FALLBACK_SAMPLES);
+            }
+        } catch (err) {
+            // При надвишен лимит на GitHub API зареждаме резервния списък без прекъсване
+            populateDropdown(FALLBACK_SAMPLES);
+        }
+    }
+
     selectEl.addEventListener("change", () => loadSample(selectEl.value));
     toggleEl.addEventListener("change", renderTexts);
 
-    // Първоначално зареждане на Паисий (sample003)
-    loadSample(selectEl.value);
+    initCorpus();
 </script>
 
 </body>
