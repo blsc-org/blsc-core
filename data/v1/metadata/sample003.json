@@ -1,0 +1,14 @@
+{
+  "id": "sample003",
+  "author": "Паисий Хилендарски",
+  "title": "История славянобългарска (откъс)",
+  "year": 1762,
+  "period": "early_revival_1762",
+  "orthography": "church_slavonic_hybrid",
+  "genre": "historiography",
+  "script": "Cyrillic",
+  "morph_layer": false,
+  "syntax_layer": false,
+  "normalized_text": "normalized/sample003.txt",
+  "rights": "public_domain"
+}
