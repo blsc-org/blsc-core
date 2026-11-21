@@ -1,14 +1,14 @@
 {
-  "id": "sample004",
-  "author": "Учредително народно събрание",
+  "document_id": "sample004",
   "title": "Търновска конституция (чл. 4 и чл. 12)",
-  "year": 1879,
-  "period": "post_liberation_1879",
-  "orthography": "drinov_orthography",
-  "genre": "legal_constitutional",
-  "script": "Cyrillic",
-  "morph_layer": false,
-  "syntax_layer": false,
-  "normalized_text": "normalized/sample004.txt",
-  "rights": "public_domain"
+  "author": "Учредително народно събрание",
+  "year": "1879",
+  "source": "Public Domain • Конституция на Българското Княжество (1879)",
+  "license": "Public Domain",
+  "language": "Bulgarian",
+  "genre": "legal",
+  "domain": "constitutional",
+  "tokens": 37,
+  "sentences": 2,
+  "notes": "Post-Liberation constitutional text in Drinov orthography (1879)."
 }
