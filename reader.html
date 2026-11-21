@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BLSC — Интерактивен четец на историческия корпус</title>
+    <style>
+        :root {
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --border: #e2e8f0;
+            --text: #1e293b;
+            --muted: #64748b;
+            --primary: #1d4ed8;
+            --primary-hover: #1e40af;
+            --accent-bg: #eff6ff;
+            --diff-old: #fef2f2;
+            --diff-old-text: #b91c1c;
+            --diff-new: #f0fdf4;
+            --diff-new-text: #15803d;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            color: white;
+            padding: 2rem 1.5rem;
+            text-align: center;
+        }
+        header h1 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.75rem;
+            letter-spacing: -0.02em;
+        }
+        header p {
+            margin: 0 auto;
+            max-width: 680px;
+            color: #cbd5e1;
+            font-size: 0.98rem;
+        }
+        .badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.15);
+            padding: 0.2rem 0.65rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+        }
+        main {
+            max-width: 1120px;
+            margin: -1.5rem auto 3rem auto;
+            padding: 0 1rem;
+        }
+        .controls-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .select-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            flex: 1;
+            min-width: 260px;
+        }
+        label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--muted);
+            letter-spacing: 0.04em;
+        }
+        select {
+            padding: 0.65rem 0.85rem;
+            font-size: 1rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #fff;
+            color: var(--text);
+            cursor: pointer;
+            font-weight: 500;
+        }
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.15);
+        }
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding-top: 1.2rem;
+        }
+        .toggle-group input {
+            width: 1.1rem;
+            height: 1.1rem;
+            cursor: pointer;
+        }
+        .toggle-group span {
+            font-size: 0.92rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .meta-bar {
+            margin-top: 1.25rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 0.75rem;
+        }
+        .meta-item {
+            font-size: 0.88rem;
+        }
+        .meta-item strong {
+            display: block;
+            color: var(--muted);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+        .reader-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem;
+            margin-top: 1.25rem;
+        }
+        @media (max-width: 768px) {
+            .reader-grid { grid-template-columns: 1fr; }
+            .toggle-group { padding-top: 0; }
+        }
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .panel-header {
+            padding: 0.85rem 1.25rem;
+            background: #f1f5f9;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .panel-header h2 {
+            margin: 0;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #334155;
+        }
+        .panel-tag {
+            font-size: 0.75rem;
+            padding: 0.15rem 0.55rem;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+        .tag-raw { background: #fee2e2; color: #991b1b; }
+        .tag-norm { background: #dcfce7; color: #166534; }
+        .text-body {
+            padding: 1.5rem;
+            font-size: 1.15rem;
+            line-height: 1.85;
+            font-family: Georgia, "Times New Roman", serif;
+            flex: 1;
+            min-height: 220px;
+        }
+        .word-diff-old {
+            background-color: var(--diff-old);
+            color: var(--diff-old-text);
+            padding: 0.05rem 0.25rem;
+            border-radius: 4px;
+            border-bottom: 1px dashed #fca5a5;
+        }
+        .word-diff-new {
+            background-color: var(--diff-new);
+            color: var(--diff-new-text);
+            padding: 0.05rem 0.25rem;
+            border-radius: 4px;
+            border-bottom: 1px dashed #86efac;
+        }
+        .notes-box {
+            margin-top: 1.25rem;
+            background: var(--accent-bg);
+            border: 1px solid #bfdbfe;
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
+            font-size: 0.92rem;
+            color: #1e3a8a;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+        .links-row {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+        .btn-link {
+            display: inline-block;
+            text-decoration: none;
+            background: var(--primary);
+            color: white;
+            padding: 0.45rem 0.85rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: background 0.15s;
+        }
+        .btn-link:hover { background: var(--primary-hover); }
+        .btn-outline {
+            background: white;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+        .btn-outline:hover { background: #eff6ff; }
+        .status-msg {
+            text-align: center;
+            padding: 2rem;
+            color: var(--muted);
+            font-style: italic;
+        }
+        footer {
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.85rem;
+            margin-top: 2.5rem;
+            padding-bottom: 2rem;
+        }
+        footer a { color: var(--primary); text-decoration: none; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="badge">BLSC • v0.1.0-alpha Жив преглед</div>
+    <h1>Български корпус за език и писменост</h1>
+    <p>Сравнете автентичния исторически правопис (1762–1904 г.) с осъвременения български текст директно от хранилището <strong>blsc-core</strong>.</p>
+</header>
+
+<main>
+    <div class="controls-card">
+        <div class="select-group">
+            <label for="sampleSelect">Изберете исторически документ:</label>
+            <select id="sampleSelect">
+                <option value="sample003">1762 г. — Паисий Хилендарски: „История славянобългарска“</option>
+                <option value="sample006">1806 г. — Софроний Врачански: „Неделник“ (първа печатна книга)</option>
+                <option value="sample007">1875 г. — Христо Ботев: в. „Знаме“ (революционна публицистика)</option>
+                <option value="sample004">1879 г. — Учредително събрание: „Търновска конституция“</option>
+                <option value="sample010">1884 г. — Захари Стоянов: „Записки по българските въстания“</option>
+                <option value="sample005">1894 г. — Иван Вазов: „Под игото“ (първо издание)</option>
+                <option value="sample009">1895 г. — Алеко Константинов: „Бай Ганьо“</option>
+                <option value="sample008">1904 г. — Елин Пелин: „По жътва“ (Иванчевски правопис)</option>
+            </select>
+        </div>
+
+        <label class="toggle-group">
+            <input type="checkbox" id="highlightToggle" checked>
+            <span>Оцвети променените думи</span>
+        </label>
+    </div>
+
+    <div class="meta-bar" id="metaBar">
+        <div class="meta-item"><strong>Автор</strong><span id="metaAuthor">—</span></div>
+        <div class="meta-item"><strong>Година</strong><span id="metaYear">—</span></div>
+        <div class="meta-item"><strong>Жанр</strong><span id="metaGenre">—</span></div>
+        <div class="meta-item"><strong>Думи / Изречения</strong><span id="metaStats">—</span></div>
+    </div>
+
+    <div class="reader-grid">
+        <div class="panel">
+            <div class="panel-header">
+                <h2>Оригинален текст (Исторически правопис)</h2>
+                <span class="panel-tag tag-raw">raw</span>
+            </div>
+            <div class="text-body" id="rawText"><div class="status-msg">Зареждане от GitHub...</div></div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <h2>Нормализиран текст (Съвременен български)</h2>
+                <span class="panel-tag tag-norm">normalized</span>
+            </div>
+            <div class="text-body" id="normText"><div class="status-msg">Зареждане от GitHub...</div></div>
+        </div>
+    </div>
+
+    <div class="notes-box">
+        <div id="metaNotes">Изберете документ от менюто, за да видите бележките към правописа.</div>
+        <div class="links-row">
+            <a id="linkRaw" class="btn-link btn-outline" href="#" target="_blank">RAW (.txt)</a>
+            <a id="linkNorm" class="btn-link btn-outline" href="#" target="_blank">NORMALIZED (.txt)</a>
+            <a id="linkJson" class="btn-link" href="#" target="_blank">Паспорт (.json)</a>
+        </div>
+    </div>
+
+    <footer>
+        Данните се зареждат в реално време от <a href="https://github.com/blsc-org/blsc-core" target="_blank">github.com/blsc-org/blsc-core</a> (Лиценз: Public Domain / CC0).
+    </footer>
+</main>
+
+<script>
+    const BASE_RAW_URL = "https://raw.githubusercontent.com/blsc-org/blsc-core/main/data/v1";
+    const BASE_GITHUB_URL = "https://github.com/blsc-org/blsc-core/blob/main/data/v1";
+
+    const selectEl = document.getElementById("sampleSelect");
+    const toggleEl = document.getElementById("highlightToggle");
+    const rawEl = document.getElementById("rawText");
+    const normEl = document.getElementById("normText");
+
+    let currentRaw = "";
+    let currentNorm = "";
+
+    function escapeHtml(str) {
+        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    function renderTexts() {
+        if (!toggleEl.checked) {
+            rawEl.textContent = currentRaw;
+            normEl.textContent = currentNorm;
+            return;
+        }
+
+        const rawWords = currentRaw.trim().split(/\s+/);
+        const normWords = currentNorm.trim().split(/\s+/);
+
+        if (rawWords.length === normWords.length) {
+            let rawHtml = [];
+            let normHtml = [];
+            for (let i = 0; i < rawWords.length; i++) {
+                if (rawWords[i] !== normWords[i]) {
+                    rawHtml.push(`<span class="word-diff-old">${escapeHtml(rawWords[i])}</span>`);
+                    normHtml.push(`<span class="word-diff-new">${escapeHtml(normWords[i])}</span>`);
+                } else {
+                    rawHtml.push(escapeHtml(rawWords[i]));
+                    normHtml.push(escapeHtml(normWords[i]));
+                }
+            }
+            rawEl.innerHTML = rawHtml.join(" ");
+            normEl.innerHTML = normHtml.join(" ");
+        } else {
+            const normSet = new Set(normWords.map(w => w.replace(/[.,!?;:„“"()—]/g, "").toLowerCase()));
+            const rawSet = new Set(rawWords.map(w => w.replace(/[.,!?;:„“"()—]/g, "").toLowerCase()));
+
+            rawEl.innerHTML = rawWords.map(w => {
+                const clean = w.replace(/[.,!?;:„“"()—]/g, "").toLowerCase();
+                return (!normSet.has(clean) && clean.length > 0)
+                    ? `<span class="word-diff-old">${escapeHtml(w)}</span>`
+                    : escapeHtml(w);
+            }).join(" ");
+
+            normEl.innerHTML = normWords.map(w => {
+                const clean = w.replace(/[.,!?;:„“"()—]/g, "").toLowerCase();
+                return (!rawSet.has(clean) && clean.length > 0)
+                    ? `<span class="word-diff-new">${escapeHtml(w)}</span>`
+                    : escapeHtml(w);
+            }).join(" ");
+        }
+    }
+
+    async function loadSample(sampleId) {
+        rawEl.innerHTML = '<div class="status-msg">Зареждане...</div>';
+        normEl.innerHTML = '<div class="status-msg">Зареждане...</div>';
+
+        document.getElementById("linkRaw").href = `${BASE_GITHUB_URL}/raw/${sampleId}.txt`;
+        document.getElementById("linkNorm").href = `${BASE_GITHUB_URL}/normalized/${sampleId}.txt`;
+        document.getElementById("linkJson").href = `${BASE_GITHUB_URL}/metadata/${sampleId}.json`;
+
+        try {
+            const [rawRes, normRes, metaRes] = await Promise.all([
+                fetch(`${BASE_RAW_URL}/raw/${sampleId}.txt`),
+                fetch(`${BASE_RAW_URL}/normalized/${sampleId}.txt`),
+                fetch(`${BASE_RAW_URL}/metadata/${sampleId}.json`)
+            ]);
+
+            if (!rawRes.ok || !normRes.ok || !metaRes.ok) {
+                throw new Error("Грешка при извличане на данните от GitHub.");
+            }
+
+            currentRaw = await rawRes.text();
+            currentNorm = await normRes.text();
+            const meta = await metaRes.json();
+
+            document.getElementById("metaAuthor").textContent = meta.author || "Неизвестен";
+            document.getElementById("metaYear").textContent = meta.year || "—";
+            document.getElementById("metaGenre").textContent = meta.genre || "—";
+            document.getElementById("metaStats").textContent = `${meta.tokens ?? "?"} думи / ${meta.sentences ?? "?"} изр.`;
+            document.getElementById("metaNotes").innerHTML = `<strong>Бележка:</strong> ${escapeHtml(meta.notes || meta.source || "")}`;
+
+            renderTexts();
+        } catch (err) {
+            rawEl.innerHTML = `<div class="status-msg">Неуспешно зареждане: ${err.message}</div>`;
+            normEl.innerHTML = `<div class="status-msg">Проверете интернет връзката или наличността на файла в GitHub.</div>`;
+        }
+    }
+
+    selectEl.addEventListener("change", () => loadSample(selectEl.value));
+    toggleEl.addEventListener("change", renderTexts);
+
+    // Първоначално зареждане на Паисий (sample003)
+    loadSample(selectEl.value);
+</script>
+
+</body>
+</html>
