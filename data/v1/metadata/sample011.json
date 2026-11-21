@@ -1,0 +1,16 @@
+{
+  "id": "sample011",
+  "title": "Българи от старо време",
+  "author": "Любен Каравелов",
+  "year": 1867,
+  "period": "revival_1860s",
+  "orthography": "karavelov_pre_reform",
+  "genre": "fiction",
+  "script": "Cyrillic",
+  "tokens": 77,
+  "sentences": 2,
+  "normalized_available": true,
+  "rights": "public_domain",
+  "source": "Любен Каравелов, Българи от старо време, 1867 г.",
+  "notes": "Възрожденски правопис от 60-те години на XIX век с употреба на ят (ѣ), голям юс (ѫ) и краесловни ерове (ъ, ь)."
+}
