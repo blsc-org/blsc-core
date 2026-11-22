@@ -8,6 +8,7 @@ Folders
 raw/            – Original source texts, unmodified.
 normalized/     – Cleaned and normalized versions of raw texts.
 metadata/       – JSON / CSV metadata files for each document.
+facsimiles/     – Optional archival scans and images (PDF/JPG/PNG) of original documents.
 samples/        – Small example files for demonstration and testing.
 
 Version Status
