@@ -183,6 +183,7 @@
             font-family: Georgia, "Times New Roman", serif;
             flex: 1;
             min-height: 220px;
+            white-space: pre-line;
         }
         .word-diff-old {
             background-color: var(--diff-old);
@@ -235,6 +236,11 @@
             border: 1px solid var(--primary);
         }
         .btn-outline:hover { background: #eff6ff; }
+        .btn-facsimile {
+            background: #047857;
+            color: white;
+        }
+        .btn-facsimile:hover { background: #065f46; }
         .status-msg {
             text-align: center;
             padding: 2rem;
@@ -302,6 +308,7 @@
     <div class="notes-box">
         <div id="metaNotes">Зареждане на бележките към правописа...</div>
         <div class="links-row">
+            <a id="linkFacsimile" class="btn-link btn-facsimile" href="#" target="_blank" style="display:none;">📄 Оригинал (Факсимиле)</a>
             <a id="linkRaw" class="btn-link btn-outline" href="#" target="_blank">RAW (.txt)</a>
             <a id="linkNorm" class="btn-link btn-outline" href="#" target="_blank">NORMALIZED (.txt)</a>
             <a id="linkJson" class="btn-link" href="#" target="_blank">Паспорт (.json)</a>
@@ -315,19 +322,21 @@
 
 <script>
     const API_META_URL = "https://api.github.com/repos/blsc-org/blsc-core/contents/data/v1/metadata";
+    const API_FACS_URL = "https://api.github.com/repos/blsc-org/blsc-core/contents/data/v1/facsimiles";
     const BASE_RAW_URL = "https://raw.githubusercontent.com/blsc-org/blsc-core/main/data/v1";
     const BASE_GITHUB_URL = "https://github.com/blsc-org/blsc-core/blob/main/data/v1";
 
-    // Резервен списък при лимит на заявките към GitHub API
     const FALLBACK_SAMPLES = [
         { id: "sample003", year: "1762", author: "Паисий Хилендарски", title: "История славянобългарска" },
         { id: "sample006", year: "1806", author: "Софроний Врачански", title: "Неделник" },
+        { id: "sample011", year: "1867", author: "Любен Каравелов", title: "Българи от старо време" },
         { id: "sample007", year: "1875", author: "Христо Ботев", title: "в. „Знаме“" },
         { id: "sample004", year: "1879", author: "Учредително събрание", title: "Търновска конституция" },
         { id: "sample010", year: "1884", author: "Захари Стоянов", title: "Записки по българските въстания" },
         { id: "sample005", year: "1894", author: "Иван Вазов", title: "Под игото" },
         { id: "sample009", year: "1895", author: "Алеко Константинов", title: "Бай Ганьо" },
-        { id: "sample008", year: "1904", author: "Елин Пелин", title: "По жътва" }
+        { id: "sample008", year: "1904", author: "Елин Пелин", title: "По жътва" },
+        { id: "sample012", year: "1925", author: "Кооперация „Виделина“", title: "Акт за полагане основния камък на електрическа централа „Виделина“" }
     ];
 
     const selectEl = document.getElementById("sampleSelect");
@@ -335,10 +344,12 @@
     const rawEl = document.getElementById("rawText");
     const normEl = document.getElementById("normText");
     const badgeEl = document.getElementById("corpusBadge");
+    const facsimileBtn = document.getElementById("linkFacsimile");
 
     let currentRaw = "";
     let currentNorm = "";
     const metaCache = {};
+    const facsimileMap = {};
 
     function escapeHtml(str) {
         return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -416,6 +427,14 @@
             const meta = metaCache[sampleId] || await responses[2].json();
             metaCache[sampleId] = meta;
 
+            const facsFile = meta.facsimile || facsimileMap[sampleId];
+            if (facsFile) {
+                facsimileBtn.href = `${BASE_GITHUB_URL}/facsimiles/${facsFile}`;
+                facsimileBtn.style.display = "inline-block";
+            } else {
+                facsimileBtn.style.display = "none";
+            }
+
             document.getElementById("metaAuthor").textContent = meta.author || "Неизвестен";
             document.getElementById("metaYear").textContent = meta.year || "—";
             document.getElementById("metaGenre").textContent = meta.genre || "—";
@@ -454,11 +473,26 @@
 
     async function initCorpus() {
         try {
-            const listRes = await fetch(API_META_URL);
+            const [listRes, facsRes] = await Promise.all([
+                fetch(API_META_URL),
+                fetch(API_FACS_URL).catch(() => null)
+            ]);
+
+            if (facsRes && facsRes.ok) {
+                const facsFiles = await facsRes.json();
+                if (Array.isArray(facsFiles)) {
+                    facsFiles.forEach(f => {
+                        if (f.name && f.name !== ".keep" && f.name !== ".gitkeep") {
+                            const id = f.name.replace(/\.[^/.]+$/, "");
+                            facsimileMap[id] = f.name;
+                        }
+                    });
+                }
+            }
+
             if (!listRes.ok) throw new Error("API limit or network issue");
             const files = await listRes.json();
 
-            // Взимаме само файловете започващи със sample (без техническите шаблони sample001 и sample002)
             const jsonFiles = files.filter(f =>
                 f.name.startsWith("sample") &&
                 f.name.endsWith(".json") &&
@@ -485,7 +519,6 @@
                 populateDropdown(FALLBACK_SAMPLES);
             }
         } catch (err) {
-            // При надвишен лимит на GitHub API зареждаме резервния списък без прекъсване
             populateDropdown(FALLBACK_SAMPLES);
         }
     }
