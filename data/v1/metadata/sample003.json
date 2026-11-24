@@ -3,12 +3,13 @@
   "title": "История славянобългарска (откъс)",
   "author": "Паисий Хилендарски",
   "year": "1762",
-  "source": "Public Domain • Препис / издание на 'Исторїя славѣноболгарская'",
+  "source": "Исторїя славѣноболгарская • Reproduced historical text, edition unidentified",
   "license": "Public Domain",
   "language": "Bulgarian",
   "genre": "historiography",
   "domain": "historical",
-  "tokens": 27,
-  "sentences": 3,
-  "notes": "Early Bulgarian Revival text in Church Slavonic hybrid orthography (1762)."
+  "tokens": null,
+  "sentences": null,
+  "facsimile": "sample003.webp",
+  "notes": "Early Bulgarian Revival text in Church Slavonic hybrid orthography (1762). Transcribed from a reproduced historical text preserving archaic graphemes, titla, punctuation and editorial brackets. Transcription pending verification. Public Domain status applies to the historical text; image rights remain unverified."
 }
